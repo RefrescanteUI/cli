@@ -2,6 +2,13 @@
   "name": "refrescante",
   "module": "index.ts",
   "type": "module",
+  "version": "0.0.1",
+  "bin": {
+    "refrescante": "./index.ts"
+  },
+  "scripts": {
+    "refrescate": "link:refrescante"
+  },
   "devDependencies": {
     "@types/bun": "^1.1.16"
   },
