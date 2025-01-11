@@ -10,9 +10,13 @@
     "refrescate": "link:refrescante"
   },
   "devDependencies": {
-    "@types/bun": "^1.1.16"
+    "@types/bun": "^1.1.16",
+    "@types/yargs": "^17.0.33"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "yargs": "^17.7.2"
   }
 }
