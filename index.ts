@@ -1,47 +1,65 @@
 #!/usr/bin/env bun
+
+/**
+ * @fileoverview RefrescanteUI CLI - Command line interface for managing RefrescanteUI projects
+ */
+
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { readFileSync } from "fs";
+import type { ArgumentsCamelCase, Argv } from 'yargs';
 
 /**
- * Read the version number from package.json.
- * This will be used for displaying version information in the CLI.
+ * Interface for CLI arguments passed to command handlers
+ * @interface CLIArguments
+ */
+interface CLIArguments {
+    componentName?: string;
+    components?: string[];
+    [key: string]: unknown;
+}
+
+/**
+ * Read package version from package.json
+ * Used for displaying version information in CLI commands
  */
 const { version } = JSON.parse(readFileSync('./package.json', 'utf8'));
 
-/**
- * If the `--version` flag is provided, print the version number and exit.
- * This ensures that the version can be checked without invoking any commands.
- */
+// Handle standalone version flag before yargs initialization
 if (process.argv.includes("--version")) {
     console.log(version);
     process.exit(0);
 }
 
-// Initialize yargs CLI instance and store it in a variable
+/**
+ * Initialize the CLI with yargs
+ * Configure global options and command structure
+ */
 const cli = yargs(hideBin(process.argv))
-    .scriptName("refrescante") // Name of the CLI tool
-    .usage("Usage: $0 <command> [options]") // Usage instructions
-    .help() // Provide help on usage when --help is called
-    .alias("h", "help") // Short alias for --help
-    .version(version) // Automatically handles --version
-    .alias("v", "version") // Short alias for --version
+    // Set CLI name and usage information
+    .scriptName("refrescante")
+    .usage("Usage: $0 <command> [options]")
+    // Configure global help and version flags
+    .help()
+    .alias("h", "help")
+    .version(version)
+    .alias("v", "version")
     /**
-     * Default command when no other commands are provided.
-     * Displays the version number and the general help message.
+     * Default command - displays version when no command is specified
+     * @command $0
      */
     .command(
         "$0",
-        "Displays version and help message",
+        "Displays version number",
         () => {},
         () => {
             console.log(`Refrescante version: ${version}`);
-            cli.showHelp(); // Show help message using the stored CLI instance
         }
     )
     /**
-     * Initializes a new RefrescanteUI project.
-     * Placeholder logic can be added here for initializing the project.
+     * Initialize a new RefrescanteUI project
+     * Sets up the necessary files and structure in the current directory
+     * @command init
      */
     .command(
         "init",
@@ -52,8 +70,9 @@ const cli = yargs(hideBin(process.argv))
         }
     )
     /**
-     * Adds a component to the project.
-     * The component name is required and passed as a positional argument.
+     * Add a new component to the project
+     * @command add <component-name>
+     * @param {string} component-name - Name of the component to create
      */
     .command(
         "add <component-name>",
@@ -62,16 +81,17 @@ const cli = yargs(hideBin(process.argv))
             return yargs.positional("component-name", {
                 describe: "The name of the component to add",
                 type: "string",
-                demandOption: true, // Component name is mandatory
+                demandOption: true,
             });
         },
-        (argv) => {
+        (argv: CLIArguments) => {
             console.log(`Adding component: ${argv["component-name"]}`);
         }
     )
     /**
-     * Removes a component from the project.
-     * The component name is required and passed as a positional argument.
+     * Remove an existing component from the project
+     * @command remove <component-name>
+     * @param {string} component-name - Name of the component to remove
      */
     .command(
         "remove <component-name>",
@@ -80,48 +100,52 @@ const cli = yargs(hideBin(process.argv))
             return yargs.positional("component-name", {
                 describe: "The name of the component to remove",
                 type: "string",
-                demandOption: true, // Component name is mandatory
+                demandOption: true,
             });
         },
-        (argv) => {
+        (argv: CLIArguments) => {
             console.log(`Removing component: ${argv["component-name"]}`);
         }
     )
     /**
-     * Upgrades the Refrescante package or specific components.
-     * If components are provided, those are upgraded, otherwise, all components are upgraded.
+     * Upgrade RefrescanteUI package or specific components
+     * @command upgrade [components...]
+     * @param {string[]} [components] - Optional list of components to upgrade
      */
-    .command(
-        "upgrade [components...]",
-        "Upgrade Refrescante package version and optionally specific components or all",
-        (yargs) => {
-            return yargs.option("components", {
-                describe: "List of components to upgrade (leave blank to upgrade all)",
-                type: "array",
-            });
+    .command({
+        command: 'upgrade [components...]',
+        describe: 'Upgrade Refrescante package version and optionally specific components or all',
+        builder: {
+            components: {
+                describe: 'List of components to upgrade (leave blank to upgrade all)',
+                type: 'array',
+            },
         },
-        (argv) => {
-            if (argv.components?.length) {
-                console.log(`Upgrading components: ${argv.components.join(", ")}`);
+        handler: (argv: ArgumentsCamelCase) => {
+            const components = argv.components as string[] | undefined;
+            if (components?.length) {
+                console.log(`Upgrading components: ${components.join(", ")}`);
             } else {
                 console.log("Upgrading Refrescante package and all components...");
             }
-        }
-    )
+        },
+    })
     /**
-     * Wipes the Refrescante package from the project.
-     * Placeholder logic can be added for cleanup.
+     * Remove RefrescanteUI completely from the project
+     * @command wipe
      */
     .command(
         "wipe",
         "Remove the Refrescante package from the project",
         () => {},
-        (argv) => {
+        (argv: CLIArguments) => {
             console.log("Wiping Refrescante package from the project...");
         }
     )
-    .strict() // Enforce strict mode to ensure a valid command is provided
-    .demandCommand(1, "You need to specify a command"); // Ensure that at least one command is specified
+    // Enable strict mode to catch invalid commands
+    .strict()
+    // Require at least one command to be specified
+    .demandCommand(1, "You need to specify a command");
 
-// Parse the arguments
+// Parse and execute the command
 cli.parse();
