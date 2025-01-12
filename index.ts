@@ -2,6 +2,9 @@
 
 /**
  * @fileoverview RefrescanteUI CLI - Command line interface for managing RefrescanteUI projects
+ * 
+ * TODO: Implement i18n starting with English and Spanish
+ * TODO: Add a global config command to configure common project settings
  */
 
 import yargs from "yargs";
@@ -51,7 +54,7 @@ const cli = yargs(hideBin(process.argv))
     .command(
         "$0",
         "Displays version number",
-        () => {},
+        () => { },
         () => {
             console.log(`Refrescante version: ${version}`);
         }
@@ -60,11 +63,21 @@ const cli = yargs(hideBin(process.argv))
      * Initialize a new RefrescanteUI project
      * Sets up the necessary files and structure in the current directory
      * @command init
+     * 
+     * TODO: Implement logic to create necessary files and directories
+     *       e.g. src/web-components, refrescante.config.ts
+     * SUGGESTION: Use fs-extra for file and directory operations.
+     * EXAMPLE ADDITIONS:
+     *       - Check if the directory or file is already present
+     *         e.g. by checking for refrescante.config.ts and
+     *         src/web-components.
+     *       - Create a basic boilerplate file structure to be 
+     *         fetched from the github repo.
      */
     .command(
         "init",
         "Initialize the RefrescanteUI project in the current directory",
-        () => {},
+        () => { },
         () => {
             console.log("Initializing RefrescanteUI project...");
         }
@@ -73,6 +86,15 @@ const cli = yargs(hideBin(process.argv))
      * Add a new component to the project
      * @command add <component-name>
      * @param {string} component-name - Name of the component to create
+     * 
+     * TODO: Generate a new component file with boilerplate from our 
+     *       github repo and place it in src/web-components/<component-name>.tsx
+     * SUGGESTION: Validate component-name to ensure it follows naming conventions
+     * EXAMPLE ADDITIONS:
+     *       - Check if the component already exists
+     *         e.g. by checking for src/web-components/<component-name>.tsx
+     *       - Generate a new component file with boilerplate from our 
+     *         github repo and place it in src/web-components/<component-name>.tsx
      */
     .command(
         "add <component-name>",
@@ -92,6 +114,16 @@ const cli = yargs(hideBin(process.argv))
      * Remove an existing component from the project
      * @command remove <component-name>
      * @param {string} component-name - Name of the component to remove
+     * 
+     * TODO: Remove the component file from src/web-components/<component-name>.tsx
+     * SUGGESTION: Scan pages directory for references to the component as well as 
+     *             web-components directory for references to the component
+     * EXAMPLE ADDITIONS:
+     *       - Check if the component exists
+     *         e.g. by checking for src/web-components/<component-name>.tsx
+     *       - Remove the component file from src/web-components/<component-name>.tsx
+     *       - Scan pages directory for references to the component
+     *       - Scan web-components directory for references to the component
      */
     .command(
         "remove <component-name>",
@@ -111,6 +143,19 @@ const cli = yargs(hideBin(process.argv))
      * Upgrade RefrescanteUI package or specific components
      * @command upgrade [components...]
      * @param {string[]} [components] - Optional list of components to upgrade
+     * 
+     * TODO: Implement logic to upgrade RefrescanteUI package and specific components
+     *       e.g. by checking for src/web-components and src/web-components/<component-name>.tsx
+     * SUGGESTION: Each component is going to have to be versioned to implement this feature.
+     *             bun only recently updated the update command to allow for updating a specific
+     *             package without nuking the entire bun.lockb file.
+     *             SEE: https://github.com/oven-sh/bun/issues/6419
+     * EXAMPLE ADDITIONS:
+     *       - Check if the component exists
+     *         e.g. by checking for src/web-components/<component-name>.tsx
+     *       - Upgrade using bun update component-name
+     * ISSUES: It might be a good idea to update every package when upgrading all. This is
+     *         something we need to consider when implementing this feature.
      */
     .command({
         command: 'upgrade [components...]',
@@ -133,11 +178,18 @@ const cli = yargs(hideBin(process.argv))
     /**
      * Remove RefrescanteUI completely from the project
      * @command wipe
+     * 
+     * TODO: Implement logic to remove RefrescanteUI from the project
+     *       e.g. by checking for src/web-components and src/web-components/<component-name>.tsx
+     *       and checking for references.
+     * ISSUES: This will probably be a difficult thing to safely accomplish.
+     *         We might consider creating a git backup in a special branch upon every
+     *         addition to the project. Then again this might just not be worth implementing.
      */
     .command(
         "wipe",
         "Remove the Refrescante package from the project",
-        () => {},
+        () => { },
         (argv: CLIArguments) => {
             console.log("Wiping Refrescante package from the project...");
         }
