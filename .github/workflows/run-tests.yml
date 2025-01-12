@@ -20,7 +20,7 @@ jobs:
 
             # Setup bun
             - name: Setup bun
-              uses: oven-sh/bun-action@v2
+              uses: oven-sh/bun-action@v1
               with:
                 bun-version: latest
 
